@@ -103,6 +103,7 @@ class App{
                                 this.#talentSelected.delete(talent);
                             } else {
                                 if(this.#talentSelected.size==3) {
+                                    return
                                     this.hint('只能选3个天赋');
                                     return;
                                 }
@@ -173,8 +174,9 @@ class App{
             const limit = v=>{
                 v = Number(v)||0;
                 v = Math.round(v);
+                // orgin v > max ? max : v
                 return v < min ? min : (
-                    v > max ? max : v
+                    v > max ? v : v
                 )
             }
             const get = ()=>Number(inputBox.val());
@@ -193,9 +195,10 @@ class App{
             inputBox.on('input', ()=>{
                 const t = total();
                 let val = get();
-                if(t > this.#totalMax) {
-                    val -= t - this.#totalMax;
-                }
+                // if(t > this.#totalMax) {
+                //     val -= t - this.#totalMax;
+                //     console.log('val2', val)
+                // }
                 val = limit(val);
                 if(val != inputBox.val()) {
                     set(val);
@@ -243,16 +246,22 @@ class App{
                 if(total() < this.#totalMax) {
                     this.hint(`你还有${this.#totalMax-total()}属性点没有分配完`);
                     return;
-                } else if (total() > this.#totalMax) {
-                    this.hint(`你多使用了${total() - this.#totalMax}属性点`);
-                    return;
-                }
+                } 
+                // else if (total() > this.#totalMax) {
+                //     this.hint(`你多使用了${total() - this.#totalMax}属性点`);
+                //     return;
+                // }
                 this.#life.restart({
                     CHR: groups.CHR.get(),
                     INT: groups.INT.get(),
                     STR: groups.STR.get(),
                     MNY: groups.MNY.get(),
                     SPR: 5,
+                    // CHR: 100000,
+                    // INT: 100000,
+                    // STR: 100000,
+                    // MNY: 100000,
+                    // SPR: 100000,
                     TLT: Array.from(this.#talentSelected).map(({id})=>id),
                 });
                 this.switch('trajectory');
