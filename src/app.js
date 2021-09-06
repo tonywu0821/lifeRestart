@@ -233,10 +233,10 @@ class App{
         propertyPage
             .find('#start')
             .click(()=>{
-                if(total() < this.#totalMax) {
-                    this.hint(`你还有${this.#totalMax-total()}属性点没有分配完`);
-                    return;
-                } 
+                // if(total() < this.#totalMax) {
+                //     this.hint(`你还有${this.#totalMax-total()}属性点没有分配完`);
+                //     return;
+                // } 
                 // else if (total() > this.#totalMax) {
                 //     this.hint(`你多使用了${total() - this.#totalMax}属性点`);
                 //     return;
@@ -263,23 +263,23 @@ class App{
         <div id="main">
             <ul id="lifeProperty" class="lifeProperty"></ul>
             <ul id="lifeTrajectory" class="lifeTrajectory"></ul>
-            <button id="skip-slow" class="fast_forward_button" style="top:1.25rem;left: 5rem;">></button>
-            <button id="skip-fast" class="fast_forward_button" style="top:1.25rem;left: 7rem;">>></button>
-            <button id="stop-skip" class="fast_forward_button" style="top:1.25rem;left: 9rem;display: none;">停止</button>
+            <button id="skip-slow" class="fast_forward_button" style="top:1.25rem;left: 5rem;">1X</button>
+            <button id="skip-fast" class="fast_forward_button" style="top:1.25rem;left: 7rem;">4X</button>
+            <button id="stop-skip" class="fast_forward_button" style="top:1.25rem;left: 10rem;display: none;">STOP</button>
             <button id="summary" class="mainbtn" style="top:auto; bottom:0.1rem">人生总结</button>
         </div>
         `);
         
-        let t1 = null;
-        let t2 = null;
+        let speed1X = null;
+        let speed4X = null;
 
         trajectoryPage
             .find('#lifeTrajectory')
             .click(()=>{
                 if(this.#isEnd) {
-                    window.clearInterval(t1);
-                    window.clearInterval(t2);
-                    t1 = null; t2 = null;
+                    window.clearInterval(speed1X);
+                    window.clearInterval(speed4X);
+                    speed1X = null; speed4X = null;
                     trajectoryPage.find('#skip-slow').show()
                     trajectoryPage.find('#skip-fast').show()
                     trajectoryPage.find('#stop-skip').hide()
@@ -332,26 +332,26 @@ class App{
             .find('#skip-slow')
             .click(()=>{
                 if(this.#isEnd) {
-                    this.hint("人生已经结束了哦~");
+                    this.hint("你的人生已经结束了哦！");
                     return;
                 }
                 trajectoryPage.find('#skip-slow').hide()
                 trajectoryPage.find('#skip-fast').hide()
                 trajectoryPage.find('#stop-skip').show()
-                t1 = setInterval("$('#lifeTrajectory').click();", 500);
+                speed1X = setInterval("$('#lifeTrajectory').click();", 400);
             })
 
         trajectoryPage
             .find('#skip-fast')
             .click(()=>{
                 if(this.#isEnd) {
-                    this.hint("人生已经结束了哦~");
+                    this.hint("你的人生已经结束了哦！");
                     return;
                 }
                 trajectoryPage.find('#skip-slow').hide()
                 trajectoryPage.find('#skip-fast').hide()
                 trajectoryPage.find('#stop-skip').show()
-                t1 = setInterval("$('#lifeTrajectory').click();", 100);
+                speed4X = setInterval("$('#lifeTrajectory').click();", 100);
             })
 
         trajectoryPage
@@ -360,9 +360,9 @@ class App{
                 trajectoryPage.find('#skip-slow').show()
                 trajectoryPage.find('#skip-fast').show()
                 trajectoryPage.find('#stop-skip').hide()
-                window.clearInterval(t1);
-                window.clearInterval(t2);
-                t1 = null; t2 = null;
+                window.clearInterval(speed1X);
+                window.clearInterval(speed4X);
+                speed1X = null; speed4X = null;
             })
         
         // Summary
