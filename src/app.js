@@ -45,7 +45,7 @@ class App{
             <button id="themeToggleBtn">黑</button>
             <div id="title">
                 人生重开模拟器<br>
-                <div style="font-size:1.5rem; font-weight:normal;">这垃圾人生一秒也不想呆了</div>
+                <div style="font-size:1.5rem; font-weight:normal;">这人生一秒也不想呆了</div>
             </div>
             <button id="restart" class="mainbtn"><span class="iconfont">&#xe6a7;</span>立即重开</button>
         </div>
@@ -77,10 +77,10 @@ class App{
         // Talent
         const talentPage = $(`
         <div id="main">
-            <div class="head" style="font-size: 1.6rem">天赋抽卡</div>
-            <button id="random" class="mainbtn" style="top: 50%;">10连抽！</button>
+            <div class="head" style="font-size: 1.6rem">天賦抽卡</div>
+            <button id="random" class="mainbtn" style="top: 50%;">天賦隨你選！</button>
             <ul id="talents" class="selectlist"></ul>
-            <button id="next" class="mainbtn" style="top:auto; bottom:0.1em">请选择3个</button>
+            <button id="next" class="mainbtn" style="top:auto; bottom:0.1em">開始分配屬性點</button>
         </div>
         `);
 
@@ -102,12 +102,6 @@ class App{
                                 li.removeClass('selected')
                                 this.#talentSelected.delete(talent);
                             } else {
-                                if(this.#talentSelected.size==3) {
-                                    return
-                                    this.hint('只能选3个天赋');
-                                    return;
-                                }
-
                                 const exclusive = this.#life.exclusive(
                                     Array.from(this.#talentSelected).map(({id})=>id),
                                     talent.id
@@ -131,10 +125,6 @@ class App{
         talentPage
             .find('#next')
             .click(()=>{
-                if(this.#talentSelected.size!=3) {
-                    this.hint('请选择3个天赋');
-                    return;
-                }
                 this.#totalMax = 20 + this.#life.getTalentAllocationAddition(Array.from(this.#talentSelected).map(({id})=>id));
                 this.switch('property');
             })
@@ -160,7 +150,8 @@ class App{
             return t;
         }
         const freshTotal = ()=>{
-            propertyPage.find('#total').text(`可用属性点：${this.#totalMax - total()}`);
+            //propertyPage.find('#total').text(`可用属性点：${this.#totalMax - total()}`);
+            propertyPage.find('#total').text(`可用属性点：${(this.#totalMax - total() >= 0)? this.#totalMax - total() : 1-1}`);
         }
         const getBtnGroups = (name, min, max)=>{
             const group = $(`<li>${name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>`);
@@ -186,20 +177,23 @@ class App{
             }
             btnAdd.click(()=>{
                 if(total() >= this.#totalMax) {
-                    this.hint('没有可分配的点数了');
+                    this.hint('没有可用＋－來分配的点数了');
                     return;
                 }
                 set(get()+1);
             });
             btnSub.click(()=>set(get()-1));
             inputBox.on('input', ()=>{
-                const t = total();
+                // const t = total();
                 let val = get();
+                // console.log('t', t)
+                // console.log('val', val)
                 // if(t > this.#totalMax) {
                 //     val -= t - this.#totalMax;
                 //     console.log('val2', val)
                 // }
                 val = limit(val);
+                // console.log('val', val)
                 if(val != inputBox.val()) {
                     set(val);
                 }
@@ -266,20 +260,40 @@ class App{
                 });
                 this.switch('trajectory');
                 this.#pages.trajectory.born();
+                $(document).keydown(function(event){
+                    if(event.which == 32 || event.which == 13){
+                        $('#lifeTrajectory').click();
+                    }
+                })
             });
 
         // Trajectory
         const trajectoryPage = $(`
         <div id="main">
+            <ul id="lifeProperty" class="lifeProperty"></ul>
             <ul id="lifeTrajectory" class="lifeTrajectory"></ul>
+            <button id="skip-slow" class="mainbtn" style="top:2.5rem;left: 8rem;">></button>
+            <button id="skip-fast" class="mainbtn" style="top:2.5rem;left: 14rem;">>></button>
+            <button id="stop-skip" class="mainbtn" style="top:2.5rem;left: 20rem;display: none;">停止</button>
             <button id="summary" class="mainbtn" style="top:auto; bottom:0.1rem">人生总结</button>
         </div>
         `);
+        
+        let t1 = null;
+        let t2 = null;
 
         trajectoryPage
             .find('#lifeTrajectory')
             .click(()=>{
-                if(this.#isEnd) return;
+                if(this.#isEnd) {
+                    window.clearInterval(t1);
+                    window.clearInterval(t2);
+                    t1 = null; t2 = null;
+                    trajectoryPage.find('#skip-slow').show()
+                    trajectoryPage.find('#skip-fast').show()
+                    trajectoryPage.find('#stop-skip').hide()
+                    return;
+                }
                 const trajectory = this.#life.next();
                 const { age, content, isEnd } = trajectory;
 
@@ -298,17 +312,68 @@ class App{
                 li.appendTo('#lifeTrajectory');
                 $("#lifeTrajectory").scrollTop($("#lifeTrajectory")[0].scrollHeight);
                 if(isEnd) {
+                    $(document).unbind("keydown");
                     this.#isEnd = true;
                     trajectoryPage.find('#summary').show();
+                } else {
+                    // 如未死亡，更新数值
+                    // Update properties if not die yet
+                    const property = this.#life.getLastRecord();
+                    $("#lifeProperty").html(`
+                    <li>颜值：${property.CHR} </li> 
+                    <li>智力：${property.INT} </li> 
+                    <li>体质：${property.STR} </li> 
+                    <li>家境：${property.MNY} </li>
+                    <li>快乐：${property.STR} </li>`);
                 }
             });
 
         trajectoryPage
             .find('#summary')
             .click(()=>{
+                trajectoryPage.find('#skip-slow').show()
+                trajectoryPage.find('#skip-fast').show()
+                trajectoryPage.find('#stop-skip').hide()
                 this.switch('summary');
             })
+        
+            trajectoryPage
+            .find('#skip-slow')
+            .click(()=>{
+                if(this.#isEnd) {
+                    this.hint("人生已经结束了哦~");
+                    return;
+                }
+                trajectoryPage.find('#skip-slow').hide()
+                trajectoryPage.find('#skip-fast').hide()
+                trajectoryPage.find('#stop-skip').show()
+                t1 = setInterval("$('#lifeTrajectory').click();", 500);
+            })
 
+        trajectoryPage
+            .find('#skip-fast')
+            .click(()=>{
+                if(this.#isEnd) {
+                    this.hint("人生已经结束了哦~");
+                    return;
+                }
+                trajectoryPage.find('#skip-slow').hide()
+                trajectoryPage.find('#skip-fast').hide()
+                trajectoryPage.find('#stop-skip').show()
+                t1 = setInterval("$('#lifeTrajectory').click();", 100);
+            })
+
+        trajectoryPage
+            .find('#stop-skip')
+            .click(()=>{
+                trajectoryPage.find('#skip-slow').show()
+                trajectoryPage.find('#skip-fast').show()
+                trajectoryPage.find('#stop-skip').hide()
+                window.clearInterval(t1);
+                window.clearInterval(t2);
+                t1 = null; t2 = null;
+            })
+        
         // Summary
         const summaryPage = $(`
         <div id="main">
