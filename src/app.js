@@ -186,14 +186,10 @@ class App{
             inputBox.on('input', ()=>{
                 // const t = total();
                 let val = get();
-                // console.log('t', t)
-                // console.log('val', val)
                 // if(t > this.#totalMax) {
                 //     val -= t - this.#totalMax;
-                //     console.log('val2', val)
                 // }
                 val = limit(val);
-                // console.log('val', val)
                 if(val != inputBox.val()) {
                     set(val);
                 }
@@ -251,11 +247,6 @@ class App{
                     STR: groups.STR.get(),
                     MNY: groups.MNY.get(),
                     SPR: 5,
-                    // CHR: 100000,
-                    // INT: 100000,
-                    // STR: 100000,
-                    // MNY: 100000,
-                    // SPR: 100000,
                     TLT: Array.from(this.#talentSelected).map(({id})=>id),
                 });
                 this.switch('trajectory');
