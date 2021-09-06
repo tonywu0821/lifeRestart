@@ -272,9 +272,9 @@ class App{
         <div id="main">
             <ul id="lifeProperty" class="lifeProperty"></ul>
             <ul id="lifeTrajectory" class="lifeTrajectory"></ul>
-            <button id="skip-slow" class="mainbtn" style="top:2.5rem;left: 8rem;">></button>
-            <button id="skip-fast" class="mainbtn" style="top:2.5rem;left: 14rem;">>></button>
-            <button id="stop-skip" class="mainbtn" style="top:2.5rem;left: 20rem;display: none;">停止</button>
+            <button id="skip-slow" class="fast_forward_button" style="top:1.25rem;left: 5rem;">></button>
+            <button id="skip-fast" class="fast_forward_button" style="top:1.25rem;left: 7rem;">>></button>
+            <button id="stop-skip" class="fast_forward_button" style="top:1.25rem;left: 9rem;display: none;">停止</button>
             <button id="summary" class="mainbtn" style="top:auto; bottom:0.1rem">人生总结</button>
         </div>
         `);
